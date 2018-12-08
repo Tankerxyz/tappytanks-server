@@ -6,7 +6,7 @@
     "node": "11"
   },
   "scripts": {
-    "start": "nodemon src/api.js --exec babel-node",
+    "start": "nodemon --inspect src/api.js --exec babel-node",
     "build": "babel src -d dist",
     "lint": "eslint src/**/*.js",
     "lint-fix": "eslint src/**/*.js --fix",
