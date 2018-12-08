@@ -14,5 +14,7 @@ io.adapter(socketRedis({ host: REDIS_HOST, port: REDIS_PORT }));
 
 io.on('connection', (connSocket): void => {
   console.log(chalk.hex('#009688')(' [*] Socket: Connection Succeeded.'));
+  connSocket.emit('A', { foo: 'bar' });
+  connSocket.on('B', data => console.log(data));  // { foo: 'baz' }
   connSocket.on('disconnect', () => console.log(chalk.hex('#009688')(' [*] Socket: Disconnected.')));
 });

@@ -94,6 +94,9 @@ const server = app.listen(PORT, HOST, (): void => {
   sequelize.authenticate()
     .then(() => console.log(chalk.hex('#009688')(' [*] Postgres: Connection Succeeded.')))
     .catch(err => console.error(err));
+
+  // todo find the better solution
+  require('~/core/socket');
 });
 
 export default server;
