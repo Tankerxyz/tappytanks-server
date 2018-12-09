@@ -22,14 +22,14 @@ const field = {
 const players = [];
 
 function generateRandomNumberRange(n) {
-  return Math.round(Math.random() * (n * 2) - n);
+  return Math.round((Math.random() * (n - 1)) - ((n - 1) / 2));
 }
 
 function generatePosition() {
   let x;
   while (true) {
     x = generateRandomNumberRange(field.width);
-    if (Math.abs(x) % 2 === 0 && !players.some((p) => p.position.x !== x)) {
+    if (Math.abs(x) % 2 === 0 && !players.some((p) => p.position.x === x)) {
       break;
     }
   }
@@ -38,7 +38,7 @@ function generatePosition() {
   while (true) {
     z = generateRandomNumberRange(field.height);
 
-    if (Math.abs(z) % 2 === 0 && !players.some((p) => p.position.z !== z)) {
+    if (Math.abs(z) % 2 === 0 && !players.some((p) => p.position.z === z)) {
       break;
     }
   }
