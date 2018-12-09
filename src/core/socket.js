@@ -13,13 +13,15 @@ io.origins(['*:*']);
 io.adapter(socketRedis({ host: REDIS_HOST, port: REDIS_PORT }));
 
 // todo all bellow is temporary
+const players = [];
+
+
 const field = {
   width: 18,
   height: 18,
   debug: true,
+  restPlayers: players,
 };
-
-const players = [];
 
 function generateRandomNumberRange(n) {
   return Math.round((Math.random() * (n - 1)) - ((n - 1) / 2));
@@ -73,6 +75,8 @@ io.on('connection', (connSocket): void => {
   connSocket.on('disconnect', (...args) => {
 
     io.emit('player-leaved', player.id);
+
+    players.splice(players.indexOf(player), 1);
 
     console.log(chalk.hex('#009688')(' [*] Socket: Disconnected.'))
   });
