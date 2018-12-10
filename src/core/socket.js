@@ -48,10 +48,17 @@ function generatePosition() {
   return { x, z, y: 1 };
 }
 
+function generateRotation() {
+  // let z = [Math.PI / 2, Math.PI, -Math.PI / 2, -Math.PI][~~(Math.random() * 4 + 1)];
+
+  return { x: -Math.PI / 2, y: 0, z: 0 }
+}
+
 function createPlayer(socket) {
   return {
     id: socket.id,
-    position: generatePosition()
+    position: generatePosition(),
+    rotation: generateRotation()
   };
 }
 
@@ -79,5 +86,11 @@ io.on('connection', (connSocket): void => {
     players.splice(players.indexOf(player), 1);
 
     console.log(chalk.hex('#009688')(' [*] Socket: Disconnected.'))
+  });
+
+  connSocket.on('change-rotation', (newRotation) => {
+    player.rotation = newRotation;
+
+    connSocket.broadcast.emit('player-changed-rotation', player);
   });
 });
