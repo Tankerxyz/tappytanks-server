@@ -18,11 +18,11 @@ import Raven from 'raven';
 import chalk from 'chalk';
 
 import routes from '~/core/rest';
-import apolloServer from '~/core/graphql';
-import mongoose from '~/core/mongoose';
-import sequelize from '~/core/sequelize';
+// import apolloServer from '~/core/graphql';
+// import mongoose from '~/core/mongoose';
+// import sequelize from '~/core/sequelize';
 import passport from '~/core/passport';
-import { client } from '~/core/redis';
+// import { client } from '~/core/redis';
 
 import { PORT, HOST, SECRET, SENTRY_DSN, RENDERTRON_URL } from './env';
 
@@ -40,13 +40,13 @@ app.use(morgan('tiny'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(session({
-  store: new (connectRedis(session))({ client }),
-  name: 'sid',
-  resave: true,
-  saveUninitialized: true,
-  secret: SECRET,
-}));
+// app.use(session({
+//   store: new (connectRedis(session))({ client }),
+//   name: 'sid',
+//   resave: true,
+//   saveUninitialized: true,
+//   secret: SECRET,
+// }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
@@ -61,7 +61,7 @@ app.use('/__', routes);
 /**
  * @name GraphQL
  */
-apolloServer.applyMiddleware({ app, path: '/__/graphql' });
+// apolloServer.applyMiddleware({ app, path: '/__/graphql' });
 
 if (process.env.NODE_ENV === 'production') app.use(Raven.errorHandler());
 
@@ -88,12 +88,12 @@ const server = app.listen(PORT, HOST, (): void => {
   console.log(chalk.hex('#009688')(' [*] App: Bootstrap Succeeded.'));
   console.log(chalk.hex('#009688')(` [*] Host: http://${HOST}:${PORT}/.`));
 
-  mongoose.connection.once('open', () => console.log(chalk.hex('#009688')(' [*] Mongo: Connection Succeeded.')));
-  mongoose.connection.on('error', err => console.error(err));
-
-  sequelize.authenticate()
-    .then(() => console.log(chalk.hex('#009688')(' [*] Postgres: Connection Succeeded.')))
-    .catch(err => console.error(err));
+  // mongoose.connection.once('open', () => console.log(chalk.hex('#009688')(' [*] Mongo: Connection Succeeded.')));
+  // mongoose.connection.on('error', err => console.error(err));
+  //
+  // sequelize.authenticate()
+  //   .then(() => console.log(chalk.hex('#009688')(' [*] Postgres: Connection Succeeded.')))
+  //   .catch(err => console.error(err));
 
   // todo find the better solution
   require('~/core/socket');
