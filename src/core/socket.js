@@ -1,7 +1,7 @@
 // @flow
 
 import socket from 'socket.io';
-import socketRedis from 'socket.io-redis';
+// import socketRedis from 'socket.io-redis';
 import chalk from 'chalk';
 
 import { REDIS_PORT, REDIS_HOST } from '~/env';
@@ -10,7 +10,7 @@ import server from '~/api';
 export const io = socket.listen(server);
 
 io.origins(['*:*']);
-io.adapter(socketRedis({ host: REDIS_HOST, port: REDIS_PORT }));
+// io.adapter(socketRedis({ host: REDIS_HOST, port: REDIS_PORT }));
 
 // todo all bellow is temporary
 const players = [];
@@ -92,5 +92,12 @@ io.on('connection', (connSocket): void => {
     player.rotation = newRotation;
 
     connSocket.broadcast.emit('player-changed-rotation', player);
+  });
+
+  connSocket.on('change-position', (newPosition) => {
+    // todo add collision checking
+    player.position = newPosition;
+
+    connSocket.broadcast.emit('player-changed-position', player);
   });
 });
