@@ -1,4 +1,5 @@
 import { createServer, Server as HTTPServer } from 'http';
+import chalk from 'chalk';
 import * as express from 'express';
 import * as io from 'socket.io';
 
@@ -96,7 +97,7 @@ export default class Server {
     }
 
     this.io.on('connect', (socket: any) => {
-      console.log(`Connected client ('${socket.id}')`);
+      console.log(chalk.green(`Connected client ('${socket.id}')`));
 
       socket.emit('field', field);
 
@@ -104,6 +105,8 @@ export default class Server {
 
       socket.emit('create-player-success', player);
       socket.broadcast.emit('player-joined', player);
+
+      console.log(chalk.yellow(`Players: [${players.length}]`));
 
       socket.on('change-rotation', (newRotation: any) => {
         player.rotation = newRotation;
@@ -119,11 +122,13 @@ export default class Server {
       });
 
       socket.on('disconnect', () => {
-        console.log(`Disconnected client ('${socket.id}')`);
+        console.log(chalk.blue(`Disconnected client ('${socket.id}')`));
 
         this.io.emit('player-leaved', player.id);
 
         players.splice(players.indexOf(player), 1);
+
+        console.log(chalk.yellow(`Players: [${players.length}]`));
       });
     });
   }
