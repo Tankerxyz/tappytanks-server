@@ -38,13 +38,94 @@ export default class Server {
             console.log('Running server on port %s', this.port);
         });
 
-        this.io.on('connect', (socket: any) => {
-            console.log(`Connected client ('${socket.id}')`);
+      // todo all bellow is temporary
+      const players: any = [];
 
-            socket.on('disconnect', () => {
-                console.log(`Disconnected client ('${socket.id}')`);
-            });
+
+      const field = {
+        width: 18,
+        height: 18,
+        debug: true,
+        restPlayers: players,
+      };
+
+      function generateRandomNumberRange(n: number) {
+        return Math.round((Math.random() * (n - 1)) - ((n - 1) / 2));
+      }
+
+      function generatePosition() {
+        let x: number;
+        while (true) {
+          x = generateRandomNumberRange(field.width);
+          if (Math.abs(x) % 2 === 0 && !players.some((p: any) => p.position.x === x)) {
+            break;
+          }
+        }
+
+        let z: number;
+        while (true) {
+          z = generateRandomNumberRange(field.height);
+
+          if (Math.abs(z) % 2 === 0 && !players.some((p: any) => p.position.z === z)) {
+            break;
+          }
+        }
+
+        return { x, z, y: 1 };
+      }
+
+      function generateRotation() {
+        // let z = [Math.PI / 2, Math.PI, -Math.PI / 2, -Math.PI][~~(Math.random() * 4 + 1)];
+
+        return { x: -Math.PI / 2, y: 0, z: 0 }
+      }
+
+      function createPlayer(socket: any) {
+        return {
+          id: socket.id,
+          position: generatePosition(),
+          rotation: generateRotation()
+        };
+      }
+
+      function addNewPlayer(socket: any) {
+        const player = createPlayer(socket);
+        players.push(player);
+
+        return player;
+      }
+
+      this.io.on('connect', (socket: any) => {
+        console.log(`Connected client ('${socket.id}')`);
+
+        socket.emit('field', field);
+
+        const player = addNewPlayer(socket);
+
+        socket.emit('create-player-success', player);
+        socket.broadcast.emit('player-joined', player);
+
+        socket.on('change-rotation', (newRotation: any) => {
+          player.rotation = newRotation;
+
+          socket.broadcast.emit('player-changed-rotation', player);
         });
+
+        socket.on('change-position', (newPosition: any) => {
+          // todo add collision checking
+          player.position = newPosition;
+
+          socket.broadcast.emit('player-changed-position', player);
+        });
+
+        socket.on('disconnect', () => {
+          console.log(`Disconnected client ('${socket.id}')`);
+
+          this.io.emit('player-leaved', player.id);
+
+          players.splice(players.indexOf(player), 1);
+        });
+      });
     }
 
     public getApp(): express.Application {
