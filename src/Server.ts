@@ -2,6 +2,7 @@ import { createServer, Server as HTTPServer } from 'http';
 import chalk from 'chalk';
 import * as express from 'express';
 import * as io from 'socket.io';
+import Field from './Field';
 
 export default class Server {
   public static readonly PORT: number = 3000;
@@ -42,13 +43,12 @@ export default class Server {
     // todo all bellow is temporary
     const players: any = [];
 
-
-    const field = {
+    const field = new Field({
       width: 18,
       height: 18,
       debug: true,
-      restPlayers: players,
-    };
+      players,
+    });
 
     function generateRandomNumberRange(n: number) {
       return Math.round((Math.random() * (n - 1)) - ((n - 1) / 2));
