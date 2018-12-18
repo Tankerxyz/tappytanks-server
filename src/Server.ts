@@ -2,7 +2,8 @@ import { createServer, Server as HTTPServer } from 'http';
 import chalk from 'chalk';
 import * as express from 'express';
 import * as io from 'socket.io';
-import Field from './Field';
+import Field from './entity/Field';
+import Player from './entity/Player';
 
 export default class Server {
   public static readonly PORT: number = 3000;
@@ -82,15 +83,15 @@ export default class Server {
     }
 
     function createPlayer(socket: any) {
-      return {
+      return new Player({
         id: socket.id,
         position: generatePosition(),
         rotation: generateRotation(),
-      };
+      });
     }
 
     function addNewPlayer(socket: any) {
-      const player = createPlayer(socket);
+      const player = createPlayer(socket.id);
       players.push(player);
 
       return player;
