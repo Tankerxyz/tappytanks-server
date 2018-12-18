@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import * as express from 'express';
 import * as io from 'socket.io';
 import Field from './entity/Field';
-import Player from './entity/Player';
+import PlayersCtrl from './controllers/PlayersCtrl';
 
 export default class Server {
   public static readonly PORT: number = 3000;
@@ -51,58 +51,14 @@ export default class Server {
       players,
     });
 
-    function generateRandomNumberRange(n: number) {
-      return Math.round((Math.random() * (n - 1)) - ((n - 1) / 2));
-    }
-
-    function generatePosition() {
-      let x: number;
-      while (true) {
-        x = generateRandomNumberRange(field.width);
-        if (Math.abs(x) % 2 === 0 && !players.some((p: any) => p.position.x === x)) {
-          break;
-        }
-      }
-
-      let z: number;
-      while (true) {
-        z = generateRandomNumberRange(field.height);
-
-        if (Math.abs(z) % 2 === 0 && !players.some((p: any) => p.position.z === z)) {
-          break;
-        }
-      }
-
-      return { x, z, y: 1 };
-    }
-
-    function generateRotation() {
-      // let z = [Math.PI / 2, Math.PI, -Math.PI / 2, -Math.PI][~~(Math.random() * 4 + 1)];
-
-      return { x: -Math.PI / 2, y: 0, z: 0 };
-    }
-
-    function createPlayer(socket: any) {
-      return new Player({
-        id: socket.id,
-        position: generatePosition(),
-        rotation: generateRotation(),
-      });
-    }
-
-    function addNewPlayer(socket: any) {
-      const player = createPlayer(socket.id);
-      players.push(player);
-
-      return player;
-    }
+    const playersCtrl = new PlayersCtrl({ field, players });
 
     this.io.on('connect', (socket: any) => {
       console.log(chalk.green(`Connected client ('${socket.id}')`));
 
       socket.emit('field', field);
 
-      const player = addNewPlayer(socket);
+      const player = playersCtrl.addNewPlayer(socket);
 
       socket.emit('create-player-success', player);
       socket.broadcast.emit('player-joined', player);
@@ -127,9 +83,9 @@ export default class Server {
 
         this.io.emit('player-leaved', player.id);
 
-        players.splice(players.indexOf(player), 1);
+        playersCtrl.removePlayer(player);
 
-        console.log(chalk.yellow(`Players: [${players.length}]`));
+        console.log(chalk.yellow(`Players: [${playersCtrl.players.length}]`));
       });
     });
   }
