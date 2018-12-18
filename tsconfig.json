@@ -1,7 +1,6 @@
 {
   "files": [
-    "src/*.ts",
-    "src/model/*.ts"
+    "src/**/*.ts"
   ],
   "compilerOptions": {
     "noImplicitAny": true,
