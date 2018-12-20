@@ -10,7 +10,7 @@ gulp.task('build', function () {
 
 //set up a watcher to watch over changes
 gulp.task('watch', gulp.series('build', () => {
-  gulp.watch(tsProject.src())
+  gulp.watch(tsProject.config.files)
     .on('change', gulp.series('build'));
 }));
 
