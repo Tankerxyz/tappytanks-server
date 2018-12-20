@@ -4,6 +4,8 @@ import * as express from 'express';
 import * as io from 'socket.io';
 import Field from './entity/Field';
 import PlayersCtrl from './controllers/PlayersCtrl';
+import { Socket } from 'socket.io';
+import SocketCtrl from './controllers/SocketCtrl';
 
 export default class Server {
   public static readonly PORT: number = 3000;
@@ -53,37 +55,26 @@ export default class Server {
 
     const playersCtrl = new PlayersCtrl({ field, players });
 
-    this.io.on('connect', (socket: any) => {
+    this.io.on('connect', (socket: Socket) => {
       console.log(chalk.green(`Connected client ('${socket.id}')`));
-
       socket.emit('field', field);
 
       const player = playersCtrl.addNewPlayer(socket);
+      let socketCtrl = new SocketCtrl(socket, player);
 
       socket.emit('create-player-success', player);
       socket.broadcast.emit('player-joined', player);
 
-      console.log(chalk.yellow(`Players: [${players.length}]`));
-
-      socket.on('change-rotation', (newRotation: any) => {
-        player.rotation = newRotation;
-
-        socket.broadcast.emit('player-changed-rotation', player);
-      });
-
-      socket.on('change-position', (newPosition: any) => {
-        // todo add collision checking
-        player.position = newPosition;
-
-        socket.broadcast.emit('player-changed-position', player);
-      });
+      console.log(chalk.yellow(`Players: [${playersCtrl.players.length}]`));
 
       socket.on('disconnect', () => {
         console.log(chalk.blue(`Disconnected client ('${socket.id}')`));
 
         this.io.emit('player-leaved', player.id);
-
         playersCtrl.removePlayer(player);
+
+        // said the GC that you need to clean unused class
+        socketCtrl = null;
 
         console.log(chalk.yellow(`Players: [${playersCtrl.players.length}]`));
       });
