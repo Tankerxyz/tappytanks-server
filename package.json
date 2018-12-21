@@ -11,7 +11,7 @@
   "scripts": {
     "build": "gulp build",
     "watch": "gulp watch",
-    "start": "nodemon --config package.json --inspect ./dist/index.js",
+    "start": "nodemon --delay 2.5 ./dist/index.js",
     "dev": "concurrently \"npm run watch\" \"npm start\""
   },
   "repository": {
@@ -38,9 +38,5 @@
     "gulp-typescript": "^5.0.0",
     "nodemon": "^1.18.9",
     "typescript": "^3.2.2"
-  },
-  "nodemonConfig": {
-    "inspect": true,
-    "delay": "2500"
   }
 }
