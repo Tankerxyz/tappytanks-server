@@ -42,10 +42,9 @@ export default class PlayersCtrl implements IPlayersCtrl {
   }
 
   private generateRotation() {
-    // todo add attaching the camera after rotation was sent
-    // let z = [Math.PI / 2, Math.PI, -Math.PI / 2, -Math.PI][~~(Math.random() * 4 + 1)];
+    let z = [Math.PI / 2, Math.PI, -Math.PI / 2, -Math.PI][~~(Math.random() * 4)];
 
-    return { x: -Math.PI / 2, y: 0, z: 0 };
+    return { x: -Math.PI / 2, y: 0, z };
   }
 
   public addNewPlayer(socket: any) {
