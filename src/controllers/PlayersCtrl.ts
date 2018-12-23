@@ -51,7 +51,8 @@ export default class PlayersCtrl implements IPlayersCtrl {
     const player = new Player({
       id: socket.id,
       position: this.generatePosition(),
-      rotation: this.generateRotation()
+      rotation: this.generateRotation(),
+      stat: { hp: 100, maxHp: 100}
     });
     this.players.push(player);
 
