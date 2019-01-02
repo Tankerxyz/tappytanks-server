@@ -24,7 +24,10 @@ export default class PlayersCtrl implements IPlayersCtrl {
     let x: number;
     while (true) {
       x = generateRandomNumberRange(this.field.width);
-      if (Math.abs(x) % 2 === 0 && !this.players.some((p: any) => p.position.x === x)) {
+      if (Math.abs(x) % 2 === 0
+        && !this.players.some((p: any) => p.position.x === x)
+        && !this.field.walls.some(w => w.position.x === x)
+      ) {
         break;
       }
     }
@@ -33,7 +36,10 @@ export default class PlayersCtrl implements IPlayersCtrl {
     while (true) {
       z = generateRandomNumberRange(this.field.height);
 
-      if (Math.abs(z) % 2 === 0 && !this.players.some((p: any) => p.position.z === z)) {
+      if (Math.abs(z) % 2 === 0
+        && !this.players.some((p: any) => p.position.z === z)
+        && !this.field.walls.some(w => w.position.z === z)
+      ) {
         break;
       }
     }
