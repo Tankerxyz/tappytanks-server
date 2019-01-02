@@ -6,6 +6,8 @@ import Field from './entity/Field';
 import PlayersCtrl from './controllers/PlayersCtrl';
 import { Socket } from 'socket.io';
 import SocketCtrl from './controllers/SocketCtrl';
+import Player from './entity/Player';
+import Wall from './entity/Wall';
 
 export default class Server {
   public static readonly PORT: number = 3000;
@@ -44,13 +46,15 @@ export default class Server {
     });
 
     // todo all bellow is temporary
-    const players: any = [];
+    const players: Array<Player> = [];
+    const walls: Array<Wall> = [];
 
     const field = new Field({
       width: 18,
       height: 18,
       debug: true,
       players,
+      walls,
     });
 
     const playersCtrl = new PlayersCtrl({ field, players });
