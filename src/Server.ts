@@ -8,6 +8,7 @@ import { Socket } from 'socket.io';
 import SocketCtrl from './controllers/SocketCtrl';
 import Player from './entity/Player';
 import Wall from './entity/Wall';
+import { generateWalls } from './utils';
 
 export default class Server {
   public static readonly PORT: number = 3000;
@@ -56,6 +57,7 @@ export default class Server {
       players,
       walls,
     });
+    field.walls = generateWalls(field, 3);
 
     const playersCtrl = new PlayersCtrl({ field, players });
 
