@@ -26,7 +26,7 @@ export default class PlayersCtrl implements IPlayersCtrl {
     while (true) {
       x = generateRandomNumberRange(this.field.width);
       if (Math.abs(x) % 2 === 0
-        && !this.players.some((p: any) => p.position.x === x)
+        && this.getPlayerByAxisValue('x', x).length
         && !this.field.walls.some(w => w.position.x === x)
       ) {
         break;
@@ -38,7 +38,7 @@ export default class PlayersCtrl implements IPlayersCtrl {
       z = generateRandomNumberRange(this.field.height);
 
       if (Math.abs(z) % 2 === 0
-        && !this.players.some((p: any) => p.position.z === z)
+        && this.getPlayerByAxisValue('z', z).length
         && !this.field.walls.some(w => w.position.z === z)
       ) {
         break;
@@ -54,6 +54,11 @@ export default class PlayersCtrl implements IPlayersCtrl {
     const z = arrayOfZRotations[randomIndex];
 
     return { x: -Math.PI / 2, y: 0, z };
+  }
+
+  public getPlayerByAxisValue(axisName: string, axisValue: number): Player[] {
+    // @ts-ignore todo add compareTo to Vector3 for easy checking
+    return this.players.filter(({ position }) => position[axisName] === axisValue);
   }
 
   public addNewPlayer(socket: any) {
