@@ -1,6 +1,7 @@
 import Player from '../entity/Player';
 import Field from '../entity/Field';
 import { generateRandomNumberRange } from '../utils';
+import { Vector3 } from '../types';
 
 export interface IPlayersCtrl {
   field: Field;
@@ -47,8 +48,10 @@ export default class PlayersCtrl implements IPlayersCtrl {
     return { x, z, y: 1 };
   }
 
-  private generateRotation() {
-    let z = [Math.PI / 2, Math.PI, -Math.PI / 2, -Math.PI][~~(Math.random() * 4)];
+  private generateRotation(): Vector3 {
+    const arrayOfZRotations = [Math.PI / 2, Math.PI, -Math.PI / 2, -Math.PI];
+    const randomIndex = ~~(Math.random() * 4);
+    const z = arrayOfZRotations[randomIndex];
 
     return { x: -Math.PI / 2, y: 0, z };
   }
