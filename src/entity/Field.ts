@@ -30,4 +30,9 @@ export default class Field implements IField {
       this.walls = options.walls;
     }
   }
+
+  public getWallByAxisValue(axisName: string, axisValue: number): Wall[] {
+    // @ts-ignore todo
+    return this.walls.filter(({ position }) => position[axisName] === axisValue)
+  }
 }

@@ -26,8 +26,8 @@ export default class PlayersCtrl implements IPlayersCtrl {
     while (true) {
       x = generateRandomNumberRange(this.field.width);
       if (Math.abs(x) % 2 === 0
-        && this.getPlayerByAxisValue('x', x).length
-        && !this.field.walls.some(w => w.position.x === x)
+        && !this.getPlayerByAxisValue('x', x).length
+        && !this.field.getWallByAxisValue('x', x).length
       ) {
         break;
       }
@@ -38,8 +38,8 @@ export default class PlayersCtrl implements IPlayersCtrl {
       z = generateRandomNumberRange(this.field.height);
 
       if (Math.abs(z) % 2 === 0
-        && this.getPlayerByAxisValue('z', z).length
-        && !this.field.walls.some(w => w.position.z === z)
+        && !this.getPlayerByAxisValue('z', z).length
+        && !this.field.getWallByAxisValue('z', z).length
       ) {
         break;
       }
