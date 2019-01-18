@@ -20,10 +20,10 @@ export default class PlayersCtrl implements IPlayersCtrl {
     }
   }
 
-  // todo refactor
+  // todo refactor and fix infinite-while-loop
   private generatePosition() {
     let x: number;
-    while (true) {
+    for (let i = 0; i < 10; ++i) {
       x = generateRandomNumberRange(this.field.width);
       if (Math.abs(x) % 2 === 0
         && !this.getPlayerByAxisValue('x', x).length
@@ -34,7 +34,7 @@ export default class PlayersCtrl implements IPlayersCtrl {
     }
 
     let z: number;
-    while (true) {
+    for (let i = 0; i < 10; ++i) {
       z = generateRandomNumberRange(this.field.height);
 
       if (Math.abs(z) % 2 === 0
