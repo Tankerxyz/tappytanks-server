@@ -11,7 +11,8 @@
   "scripts": {
     "build": "gulp build",
     "watch": "gulp watch",
-    "start": "nodemon --delay 2.5 ./dist/index.js",
+    "start": "nodemon -r dotenv/config --delay 2.5 ./dist/index.js",
+    "start:prod": "node -r dotenv/config ./dist/index.js",
     "dev": "concurrently \"npm run watch\" \"npm start\""
   },
   "repository": {
@@ -30,13 +31,12 @@
     "@types/socket.io": "^2.1.2",
     "chalk": "^2.4.1",
     "concurrently": "^4.1.0",
+    "dotenv": "^6.2.0",
     "express": "^4.16.4",
-    "socket.io": "^2.2.0"
-  },
-  "devDependencies": {
     "gulp": "^4.0.0",
     "gulp-typescript": "^5.0.0",
     "nodemon": "^1.18.9",
+    "socket.io": "^2.2.0",
     "typescript": "^3.2.2"
   }
 }

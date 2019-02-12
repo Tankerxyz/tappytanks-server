@@ -11,7 +11,7 @@ import Wall from './entity/Wall';
 import { generateWalls } from './utils';
 
 export default class Server {
-  public static readonly PORT: number = 3000;
+  public static readonly PORT: string = process.env.PORT;
   private app: express.Application;
   private server: HTTPServer;
   private io: SocketIO.Server;
