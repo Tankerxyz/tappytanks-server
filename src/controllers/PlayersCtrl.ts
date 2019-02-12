@@ -2,6 +2,7 @@ import Player from '../entity/Player';
 import Field from '../entity/Field';
 import { generateRandomNumberRange } from '../utils';
 import { Vector3 } from '../types';
+import { colorArray } from '../utils';
 
 export interface IPlayersCtrl {
   field: Field;
@@ -56,6 +57,19 @@ export default class PlayersCtrl implements IPlayersCtrl {
     return { x: -Math.PI / 2, y: 0, z };
   }
 
+  private generateColor(): string {
+    let color: string;
+    for (let i = 0; i < 100; ++i) {
+      color = colorArray[~~(Math.random() * colorArray.length)];
+
+      if (!this.players.some(p => p.color == color)) {
+        break;
+      }
+    }
+
+    return color;
+  };
+
   public getPlayerByAxisValue(axisName: string, axisValue: number): Player[] {
     // @ts-ignore todo add compareTo to Vector3 for easy checking
     return this.players.filter(({ position }) => position[axisName] === axisValue);
@@ -66,6 +80,7 @@ export default class PlayersCtrl implements IPlayersCtrl {
       id: socket.id,
       position: this.generatePosition(),
       rotation: this.generateRotation(),
+      color: this.generateColor(),
       stat: { hp: 100, maxHp: 100}
     });
     this.players.push(player);
