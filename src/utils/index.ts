@@ -46,3 +46,7 @@ export function generateWalls(field: Field, count: number): Array<Wall> {
 
   return walls;
 }
+
+export function getRandomIndex(maxLength: number): number {
+  return ~~(Math.random() * maxLength);
+}

@@ -1,6 +1,6 @@
 import Player from '../entity/Player';
 import Field from '../entity/Field';
-import { generateRandomNumberRange } from '../utils';
+import { generateRandomNumberRange, getRandomIndex } from '../utils';
 import { Vector3 } from '../types';
 import { colorArray } from '../utils';
 
@@ -51,7 +51,7 @@ export default class PlayersCtrl implements IPlayersCtrl {
 
   private generateRotation(): Vector3 {
     const arrayOfZRotations = [Math.PI / 2, Math.PI, -Math.PI / 2, -Math.PI];
-    const randomIndex = ~~(Math.random() * 4);
+    const randomIndex = getRandomIndex(arrayOfZRotations.length);
     const z = arrayOfZRotations[randomIndex];
 
     return { x: -Math.PI / 2, y: 0, z };
@@ -60,7 +60,7 @@ export default class PlayersCtrl implements IPlayersCtrl {
   private generateColor(): string {
     let color: string;
     for (let i = 0; i < 100; ++i) {
-      color = colorArray[~~(Math.random() * colorArray.length)];
+      color = colorArray[getRandomIndex(colorArray.length)];
 
       if (!this.players.some(p => p.color == color)) {
         break;
