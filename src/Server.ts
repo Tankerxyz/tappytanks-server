@@ -53,7 +53,7 @@ export default class Server {
     const field = new Field({
       width: 18,
       height: 18,
-      debug: true,
+      debug: false,
       players,
       walls,
     });
