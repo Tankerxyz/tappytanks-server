@@ -12,6 +12,8 @@ import { generateWalls } from './utils';
 import * as session from 'express-session';
 import * as mongoose from 'mongoose';
 import FieldModel, { IFieldModel } from './models/Field';
+import * as cors from 'cors';
+const MongoStore = require('connect-mongo')(session);
 
 export default class Server {
   public static readonly PORT: string = "3000";
@@ -25,9 +27,9 @@ export default class Server {
 
   constructor() {
     this.createApp();
+    this.configureDb();
     this.config();
     this.createServer();
-    this.configureDb();
     this.configureRoutes();
     this.sockets();
   }
@@ -44,17 +46,8 @@ export default class Server {
   }
 
   private configureRoutes(): void {
-    this.app.use(session({
-      secret: 'keyboard cat',
-      resave: false,
-      saveUninitialized: true,
-      cookie: {
-        secure: true
-      }
-    }));
-    this.app.use((req, res, next) => {
-      console.log(req.session, req.sessionID);
-      next();
+    this.app.get('/session', (req, res, next) => {
+      res.send({ userID: req.sessionID});
     });
   }
 
@@ -68,6 +61,32 @@ export default class Server {
 
   private config(): void {
     this.port = process.env.PORT || Server.PORT;
+    const whitelist = ['http://localhost:3030', 'https://ttanks.tk'];
+    const corsOptions = {
+      origin: (origin: string, callback: (err: any, result?: any) => void) => {
+        if (whitelist.indexOf(origin) !== -1) {
+          callback(null, true)
+        } else {
+          callback(new Error('Not allowed by CORS'))
+        }
+      },
+      credentials: true
+    };
+    this.app.use(cors(corsOptions));
+    this.app.use(session({
+      secret: 'keyboard cat',
+      resave: false,
+      saveUninitialized: true,
+      cookie: {
+        secure: process.env.NODE_ENV !== 'development',
+        maxAge: 8*60*60*1000,
+        httpOnly: false
+      },
+      store: new MongoStore({
+        mongooseConnection: this.db,
+        ttl: 24 * 60 * 60
+      })
+    }));
   }
 
   private sockets(): void {
