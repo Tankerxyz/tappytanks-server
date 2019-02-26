@@ -9,20 +9,53 @@ import SocketCtrl from './controllers/SocketCtrl';
 import Player from './entity/Player';
 import Wall from './entity/Wall';
 import { generateWalls } from './utils';
+import * as session from 'express-session';
+import * as mongoose from 'mongoose';
+import FieldModel, { IFieldModel } from './models/Field';
 
 export default class Server {
-  public static readonly PORT: string = process.env.PORT;
+  public static readonly PORT: string = "3000";
   private app: express.Application;
   private server: HTTPServer;
   private io: SocketIO.Server;
   private port: string | number;
+  private db: any;
+  private fieldModel: IFieldModel;
+  private field: Field;
 
   constructor() {
     this.createApp();
     this.config();
     this.createServer();
+    this.configureDb();
+    this.configureRoutes();
     this.sockets();
-    this.listen();
+  }
+
+  private configureDb(): void {
+    mongoose.connect('mongodb://localhost/tappytanks', {useNewUrlParser: true});
+    this.db = mongoose.connection;
+    this.db.on('error', console.error.bind(console, 'connection error:'));
+    this.db.once('open', () => {
+      this.listen();
+
+      console.log('we are connected to tappytanks db!');
+    });
+  }
+
+  private configureRoutes(): void {
+    this.app.use(session({
+      secret: 'keyboard cat',
+      resave: false,
+      saveUninitialized: true,
+      cookie: {
+        secure: true
+      }
+    }));
+    this.app.use((req, res, next) => {
+      console.log(req.session, req.sessionID);
+      next();
+    });
   }
 
   private createApp(): void {
@@ -41,29 +74,43 @@ export default class Server {
     this.io = io(this.server);
   }
 
-  private listen(): void {
+  private async getFieldModel(): Promise<IFieldModel> {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    let field = await FieldModel.findOne({
+      creation_date: {
+        $gte: startOfToday
+      }
+    });
+
+    if (!field) {
+      field = new FieldModel();
+      await field.save();
+    }
+
+    return field;
+  }
+
+  private async listen(): Promise<any> {
+    this.fieldModel = await this.getFieldModel();
+    this.field = new Field(this.fieldModel);
+    if (!this.field.walls.length) {
+      this.field.walls = generateWalls(this.field, 3);
+      await this.field.save();
+    }
+
+    const playersCtrl = new PlayersCtrl({
+      field: this.field,
+      players: this.field.players
+    });
+
     this.server.listen(this.port, () => {
       console.log('Running server on port %s', this.port);
     });
 
-    // todo all bellow is temporary
-    const players: Array<Player> = [];
-    const walls: Array<Wall> = [];
-
-    const field = new Field({
-      width: 18,
-      height: 18,
-      debug: true,
-      players,
-      walls,
-    });
-    field.walls = generateWalls(field, 3);
-
-    const playersCtrl = new PlayersCtrl({ field, players });
-
     this.io.on('connect', (socket: Socket) => {
       console.log(chalk.green(`Connected client ('${socket.id}')`));
-      socket.emit('field', field);
+      socket.emit('field', this.field.getNormalized());
 
       const player = playersCtrl.addNewPlayer(socket);
       let socketCtrl = new SocketCtrl(socket, player);

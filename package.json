@@ -11,7 +11,7 @@
   "scripts": {
     "build": "gulp build",
     "watch": "gulp watch",
-    "start": "nodemon -r dotenv/config --delay 2.5 ./dist/index.js",
+    "start": "nodemon -r dotenv/config --delay 2.5 --inspect ./dist/index.js",
     "start:prod": "node -r dotenv/config ./dist/index.js",
     "dev": "concurrently \"npm run watch\" \"npm start\""
   },
@@ -28,13 +28,17 @@
   "homepage": "https://github.com/Tankerxyz/tappytanks-server#readme",
   "dependencies": {
     "@types/express": "^4.16.0",
+    "@types/express-session": "^1.15.12",
+    "@types/mongoose": "^5.3.20",
     "@types/socket.io": "^2.1.2",
     "chalk": "^2.4.1",
     "concurrently": "^4.1.0",
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
+    "express-session": "^1.15.6",
     "gulp": "^4.0.0",
     "gulp-typescript": "^5.0.0",
+    "mongoose": "^5.4.15",
     "nodemon": "^1.18.9",
     "socket.io": "^2.2.0",
     "typescript": "^3.2.2"

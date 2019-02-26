@@ -1,5 +1,6 @@
 import Player from './Player';
 import Wall from './Wall';
+import { IFieldModel } from '../models/Field';
 
 export interface IField {
   width: number;
@@ -15,24 +16,42 @@ export default class Field implements IField {
   debug: boolean = false;
   players: Array<Player> = [];
   walls: Array<Wall> = [];
+  fieldModel: IFieldModel;
 
-  constructor(options: IField) {
-    this.width = options.width;
-    this.height = options.height;
+  constructor(fieldModel: IFieldModel) {
+    this.width = fieldModel.width;
+    this.height = fieldModel.height;
+    this.fieldModel = fieldModel;
 
-    if (options.debug != null) {
-      this.debug = options.debug;
+    if (fieldModel.debug != null) {
+      this.debug = fieldModel.debug;
     }
-    if (options.players != null) {
-      this.players = options.players
+    if (fieldModel.players != null) {
+      this.players = fieldModel.players
     }
-    if (options.walls != null) {
-      this.walls = options.walls;
+    if (fieldModel.walls != null) {
+      this.walls = fieldModel.walls;
     }
   }
 
   public getWallByAxisValue(axisName: string, axisValue: number): Wall[] {
     // @ts-ignore todo
     return this.walls.filter(({ position }) => position[axisName] === axisValue)
+  }
+
+  public async save(): Promise<IFieldModel> {
+    this.fieldModel.height = this.height;
+    this.fieldModel.width = this.width;
+    this.fieldModel.debug = this.debug;
+    this.fieldModel.players = this.players;
+    this.fieldModel.walls = this.walls;
+
+    return this.fieldModel.save();
+  };
+
+  public getNormalized() {
+    const field = {...this};
+    delete field.fieldModel;
+    return field;
   }
 }
