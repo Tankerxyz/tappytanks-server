@@ -18,6 +18,7 @@ export default class SocketCtrl {
       this.player.rotation = newRotation;
 
       this.socket.broadcast.emit('player-changed-rotation', this.player);
+      this.player.save();
     });
 
     this.socket.on('change-position', (newPosition: any) => {
@@ -25,6 +26,7 @@ export default class SocketCtrl {
       this.player.position = newPosition;
 
       this.socket.broadcast.emit('player-changed-position', this.player);
+      this.player.save();
     });
   }
 }

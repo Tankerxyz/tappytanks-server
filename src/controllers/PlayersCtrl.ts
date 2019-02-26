@@ -3,6 +3,7 @@ import Field from '../entity/Field';
 import { generateRandomNumberRange, getRandomIndex } from '../utils';
 import { Vector3 } from '../types';
 import { colorArray } from '../utils';
+import { IPlayerModel } from '../models/PlayerModel';
 
 export interface IPlayersCtrl {
   field: Field;
@@ -22,7 +23,7 @@ export default class PlayersCtrl implements IPlayersCtrl {
   }
 
   // todo refactor and fix infinite-while-loop
-  private generatePosition() {
+  public generatePosition() {
     let x: number;
     for (let i = 0; i < 10; ++i) {
       x = generateRandomNumberRange(this.field.width);
@@ -49,7 +50,7 @@ export default class PlayersCtrl implements IPlayersCtrl {
     return { x, z, y: 1 };
   }
 
-  private generateRotation(): Vector3 {
+  public generateRotation(): Vector3 {
     const arrayOfZRotations = [Math.PI / 2, Math.PI, -Math.PI / 2, -Math.PI];
     const randomIndex = getRandomIndex(arrayOfZRotations.length);
     const z = arrayOfZRotations[randomIndex];
@@ -57,7 +58,7 @@ export default class PlayersCtrl implements IPlayersCtrl {
     return { x: -Math.PI / 2, y: 0, z };
   }
 
-  private generateColor(): string {
+  public generateColor(): string {
     let color: string;
     for (let i = 0; i < 100; ++i) {
       color = colorArray[getRandomIndex(colorArray.length)];
@@ -75,14 +76,8 @@ export default class PlayersCtrl implements IPlayersCtrl {
     return this.players.filter(({ position }) => position[axisName] === axisValue);
   }
 
-  public addNewPlayer(socket: any) {
-    const player = new Player({
-      id: socket.id,
-      position: this.generatePosition(),
-      rotation: this.generateRotation(),
-      color: this.generateColor(),
-      stat: { hp: 100, maxHp: 100}
-    });
+  public addNewPlayer(playerModel: IPlayerModel) {
+    const player = new Player(playerModel);
     this.players.push(player);
 
     return player;

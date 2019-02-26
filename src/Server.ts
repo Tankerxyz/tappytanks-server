@@ -11,7 +11,8 @@ import Wall from './entity/Wall';
 import { generateWalls } from './utils';
 import * as session from 'express-session';
 import * as mongoose from 'mongoose';
-import FieldModel, { IFieldModel } from './models/Field';
+import FieldModel, { IFieldModel } from './models/FieldModel';
+import PlayerModel, { IPlayerModel } from './models/PlayerModel';
 import * as cors from 'cors';
 const MongoStore = require('connect-mongo')(session);
 
@@ -24,6 +25,7 @@ export default class Server {
   private db: any;
   private fieldModel: IFieldModel;
   private field: Field;
+  private playersCtrl: PlayersCtrl;
 
   constructor() {
     this.createApp();
@@ -110,6 +112,22 @@ export default class Server {
     return field;
   }
 
+  private async getOrCreatePlayerModel(userID: string): Promise<IPlayerModel> {
+    let player = await PlayerModel.findOne({ userID });
+
+    if (!player) {
+      player = new PlayerModel({
+        userID,
+        position: this.playersCtrl.generatePosition(),
+        rotation: this.playersCtrl.generateRotation(),
+        color: this.playersCtrl.generateColor()
+      });
+      await player.save();
+    }
+
+    return player;
+  }
+
   private async listen(): Promise<any> {
     this.fieldModel = await this.getFieldModel();
     this.field = new Field(this.fieldModel);
@@ -118,7 +136,7 @@ export default class Server {
       await this.field.save();
     }
 
-    const playersCtrl = new PlayersCtrl({
+    this.playersCtrl = new PlayersCtrl({
       field: this.field,
       players: this.field.players
     });
@@ -127,28 +145,34 @@ export default class Server {
       console.log('Running server on port %s', this.port);
     });
 
-    this.io.on('connect', (socket: Socket) => {
+    this.io.on('connect', async (socket: Socket) => {
       console.log(chalk.green(`Connected client ('${socket.id}')`));
       socket.emit('field', this.field.getNormalized());
 
-      const player = playersCtrl.addNewPlayer(socket);
+      const userID = socket.handshake.query.userID;
+
+      const playerModel = await this.getOrCreatePlayerModel(userID);
+      const player = this.playersCtrl.addNewPlayer(playerModel);
+
       let socketCtrl = new SocketCtrl(socket, player);
 
-      socket.emit('create-player-success', player);
-      socket.broadcast.emit('player-joined', player);
+      const normalizedPlayer = player.getNormalized();
 
-      console.log(chalk.yellow(`Players: [${playersCtrl.players.length}]`));
+      socket.emit('create-player-success', normalizedPlayer);
+      socket.broadcast.emit('player-joined', normalizedPlayer);
+
+      console.log(chalk.yellow(`Players: [${this.playersCtrl.players.length}]`));
 
       socket.on('disconnect', () => {
         console.log(chalk.blue(`Disconnected client ('${socket.id}')`));
 
-        this.io.emit('player-leaved', player.id);
-        playersCtrl.removePlayer(player);
+        this.io.emit('player-leaved', normalizedPlayer.userID);
+        this.playersCtrl.removePlayer(player);
 
         // said the GC that you need to clean unused class
         socketCtrl = null;
 
-        console.log(chalk.yellow(`Players: [${playersCtrl.players.length}]`));
+        console.log(chalk.yellow(`Players: [${this.playersCtrl.players.length}]`));
       });
     });
   }

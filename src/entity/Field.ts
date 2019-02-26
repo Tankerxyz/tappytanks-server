@@ -1,6 +1,6 @@
 import Player from './Player';
 import Wall from './Wall';
-import { IFieldModel } from '../models/Field';
+import { IFieldModel } from '../models/FieldModel';
 
 export interface IField {
   width: number;
