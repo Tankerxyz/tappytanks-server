@@ -53,9 +53,9 @@ export default class PlayersCtrl implements IPlayersCtrl {
   public generateRotation(): Vector3 {
     const arrayOfZRotations = [Math.PI / 2, Math.PI, -Math.PI / 2, -Math.PI];
     const randomIndex = getRandomIndex(arrayOfZRotations.length);
-    const z = arrayOfZRotations[randomIndex];
+    const y = arrayOfZRotations[randomIndex];
 
-    return { x: -Math.PI / 2, y: 0, z };
+    return { x: 0, y, z: 0 };
   }
 
   public generateColor(): string {
