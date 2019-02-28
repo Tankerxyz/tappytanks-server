@@ -37,7 +37,7 @@ export default class Server {
   }
 
   private configureDb(): void {
-    mongoose.connect('mongodb://localhost/tappytanks', {useNewUrlParser: true});
+    mongoose.connect(process.env.DB_URI, {useNewUrlParser: true});
     this.db = mongoose.connection;
     this.db.on('error', console.error.bind(console, 'connection error:'));
     this.db.once('open', () => {
