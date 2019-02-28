@@ -63,7 +63,7 @@ export default class Server {
 
   private config(): void {
     this.port = process.env.PORT || Server.PORT;
-    const whitelist = ['http://localhost:3030', 'https://ttanks.tk'];
+    const whitelist = process.env.ALLOWED_ORIGINS.split(';');
     const corsOptions = {
       origin: (origin: string, callback: (err: any, result?: any) => void) => {
         if (whitelist.indexOf(origin) !== -1) {
