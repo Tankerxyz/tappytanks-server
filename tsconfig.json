@@ -6,6 +6,11 @@
     "noImplicitAny": true,
     "target": "es6",
     "module": "commonjs",
-    "allowJs": true
-  }
+    "allowJs": true,
+    "rootDir": "src",
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
 }
