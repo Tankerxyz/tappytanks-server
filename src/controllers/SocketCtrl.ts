@@ -28,5 +28,10 @@ export default class SocketCtrl {
       this.socket.broadcast.emit('player-changed-position', this.player);
       this.player.save();
     });
+
+    this.socket.on('shot', () => {
+      this.socket.broadcast.emit('player-shot', this.player);
+      this.player.save();
+    });
   }
 }
